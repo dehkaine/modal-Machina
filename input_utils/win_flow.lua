@@ -1,41 +1,42 @@
 local win_flow = {}
 
 local focus_map = {
-		fc = "ChatGPT",
-		fe = "Eagle",
-		fg = "Google Chrome",
-		fi = "iTerm.app",
-		fI = "Finder",
-    fo = "Fork",
-    fp = "Adobe Photoshop 2021",
-		ft = "Terminal.app",
-    fv = "Visual Studio Code",
-		fw = "WeChat.app",
+	fc = "ChatGPT",
+	fe = "Eagle",
+	fg = "Google Chrome",
+	fG = "Godot",
+	fi = "iTerm.app",
+	fI = "Finder",
+	fo = "Fork",
+	fp = "Adobe Photoshop 2021",
+	ft = "Terminal.app",
+	fv = "Visual Studio Code",
+	fw = "WeChat.app",
 }
 
 local function restoreMinimizedWindows(app)
-    if not app then return end
-    local wins = app:allWindows()
-    for _, win in ipairs(wins) do
-        if win:isMinimized() then
-            win:unminimize()
-            win:focus()
-            break
-        end
-    end
+	if not app then return end
+	local wins = app:allWindows()
+	for _, win in ipairs(wins) do
+		if win:isMinimized() then
+			win:unminimize()
+			win:focus()
+			break
+		end
+	end
 end
 
 function win_flow.focusToAppByCmd(cmd)
-    local appName = focus_map[cmd]
-    if appName then
-        local app = hs.application.find(appName)
-        if app then
-            app:activate()
-            restoreMinimizedWindows(app)
-        else
-            hs.application.launchOrFocus(appName)
-        end
-    end
+	local appName = focus_map[cmd]
+	if appName then
+		local app = hs.application.find(appName)
+		if app then
+			app:activate()
+			restoreMinimizedWindows(app)
+		else
+			hs.application.launchOrFocus(appName)
+		end
+	end
 end
 
 function win_flow.focusLastApp()
@@ -46,10 +47,26 @@ function win_flow.focusLastApp()
 end
 
 function win_flow.restoreFrontmostApp()
-    local app = hs.application.frontmostApplication()
-    if app then
-        restoreMinimizedWindows(app)
-    end
+	local app = hs.application.frontmostApplication()
+	if app then
+		restoreMinimizedWindows(app)
+	end
 end
+
+function win_flow.moveItermBetweenMacIpad()
+	hs.osascript.applescript([[
+		tell application "iTerm2" to activate
+		tell application "System Events"
+			tell process "iTerm2"
+					click menu bar item "Window" of menu bar 1
+					repeat 8 times
+						key code 125
+					end repeat
+					key code 36
+			end tell
+		end tell
+	]])
+end
+
 
 return win_flow
